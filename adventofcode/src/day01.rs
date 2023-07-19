@@ -1,11 +1,10 @@
-mod config;
 mod elf;
 
+use crate::common::config::FilePathConfig;
 use std::fs;
-pub use config::Config;
 
 /// Solve day 1 https://adventofcode.com/2022/day/1
-pub fn run(config: Config) -> Result<(), &'static str> {
+pub fn solve(config: FilePathConfig) -> Result<(), &'static str> {
     println!("Hello from day01! {:?}", config);
 
     let contents = fs::read_to_string(&config.file_path);
