@@ -8,14 +8,14 @@ fn main() {
         process::exit(1);
     });
 
-    if let Err(err) = adventofcode::day02::solve(config) {
+    if let Err(err) = adventofcode::day03::run(config) {
         handle_app_error(err);
         process::exit(1);
     }
 }
 
 fn usage() {
-    eprintln!("Usage: {}", env::args().next().unwrap())
+    eprintln!("Usage: {} <file_name>", env::args().next().unwrap());
 }
 
 fn handle_parsing_error(err: &str) {
