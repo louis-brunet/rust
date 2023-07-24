@@ -9,7 +9,9 @@ use self::lexer::{Lexer, Token};
 pub fn run(config: FileContentConfig) -> Result<(), String> {
     println!("Day 4!");
     let res = part1_solve(&config.content)?;
-    println!(" res = {}", res);
+    println!("  Part 1: {} complete overlaps", res);
+    let res = part2_solve(&config.content)?;
+    println!("  Part 2: {} partial overlaps", res);
     return Ok(());
 }
 
@@ -20,6 +22,10 @@ pub struct Range {
 }
 
 impl Range {
+    fn intersects(&self, other: &Self) -> bool {
+        return self.min <= other.max && self.max >= other.min;
+    }
+
     fn contains(&self, other: &Self) -> bool {
         return self.min <= other.min && self.max >= other.max;
     }
@@ -31,10 +37,69 @@ impl Display for Range {
     }
 }
 
+struct ElfRangesIterator<'a> {
+    lexer: Lexer<'a>,
+}
+
+impl<'a> ElfRangesIterator<'a> {
+    fn new(input: &'a str) -> ElfRangesIterator<'a> {
+        return Self {
+            lexer: Lexer::new(input),
+        };
+    }
+}
+
+impl Iterator for ElfRangesIterator<'_> {
+    type Item = Result<[Range; 2], String>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let range1 = match parse_range(&mut self.lexer) {
+            Ok(None) => return None,
+            Ok(Some(r)) => r,
+            Err(err) => return Some(Err(err)),
+        };
+
+        match self.lexer.get_next_token() {
+            Ok((Token::Comma, ..)) => (),
+            Ok((tk, ..)) => return Some(Err(format!("Unexpected token: {:?} ", tk))),
+            Err(err) => return Some(Err(err.to_string())),
+        };
+
+        let range2 = match parse_range(&mut self.lexer) {
+            Ok(None) => return Some(Err(String::from("unexpected EOF"))),
+            Ok(Some(r)) => r,
+            Err(err) => return Some(Err(err)),
+        };
+
+        match self.lexer.get_next_token() {
+            Ok((Token::NewLine, ..)) => (),
+            Ok((tk, ..)) => return Some(Err(format!("Unexpected token: {:?} ", tk))),
+            Err(err) => return Some(Err(err.to_string())),
+        };
+
+        return Some(Ok([range1, range2]));
+    }
+}
+
 fn part1_solve<'a>(input: &str) -> Result<usize, String> {
     let mut contained_count = 0;
-    let mut lexer = Lexer::new(input);
 
+    let elf_ranges = ElfRangesIterator::new(input);
+    for ranges_result in elf_ranges {
+        let [range1, range2] = match ranges_result {
+            Ok(ranges) => ranges,
+            Err(err) => return Err(err),
+        };
+
+        if range1.contains(&range2) || range2.contains(&range1) {
+            contained_count += 1;
+        }
+    }
+
+    return Ok(contained_count);
+
+    /*
+    let mut lexer = Lexer::new(input);
     loop {
         let range1 = match parse_range(&mut lexer)? {
             None => return Ok(contained_count),
@@ -61,13 +126,37 @@ fn part1_solve<'a>(input: &str) -> Result<usize, String> {
         if range1.contains(&range2) || range2.contains(&range1) {
             contained_count += 1;
         }
+    } */
+}
+
+fn part2_solve<'a>(input: &str) -> Result<usize, String> {
+    let mut intersect_count = 0;
+
+    let elf_ranges = ElfRangesIterator::new(input);
+    /* return Ok(
+        elf_ranges
+            .map(|r| r.or_else(|e| return Err(e))).
+            .filter(|[range1, range2]| range1.intersects(&range2) || range2.intersects(&range1))
+            .count()
+    ); */
+    for ranges_result in elf_ranges {
+        let [range1, range2] = match ranges_result {
+            Ok(ranges) => ranges,
+            Err(err) => return Err(err),
+        };
+
+        if range1.intersects(&range2) || range2.intersects(&range1) {
+            intersect_count += 1;
+        }
     }
+
+    return Ok(intersect_count);
 }
 
 fn parse_range(lexer: &mut Lexer) -> Result<Option<Range>, String> {
     let mut min_token = Token::NewLine;
     while let Token::NewLine = min_token {
-        min_token =  match lexer.get_next_token() {
+        min_token = match lexer.get_next_token() {
             Ok((tk @ Token::Number(_), ..)) => tk,
             Ok((tk @ Token::NewLine, ..)) => tk,
             Ok((Token::EOF, ..)) => return Ok(None),
@@ -75,7 +164,7 @@ fn parse_range(lexer: &mut Lexer) -> Result<Option<Range>, String> {
             Err(err) => return Err(err.to_string()),
         };
     }
-    
+
     let min = match min_token {
         Token::Number(n) => n,
         tk => return Err(format!("Unexpected token: {:?} ", tk)),
@@ -131,6 +220,15 @@ mod test {
 45-66,44-88
 ";
         let res = super::part1_solve(input).unwrap();
+
+        assert_eq!(res, expected);
+    }
+
+    #[test]
+    pub fn part2_example() {
+        let expected = 4;
+
+        let res = super::part2_solve(INPUT).unwrap();
 
         assert_eq!(res, expected);
     }
