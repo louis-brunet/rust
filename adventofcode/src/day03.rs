@@ -15,7 +15,7 @@ fn part1_solve<'a>(input: impl Iterator<Item = &'a str>) -> usize {
 
     'outer: for line in input {
         let split_index = line.len() / 2;
- 
+
         for ch_left in line[..split_index].bytes() {
             for ch_right in line[split_index..].bytes() {
                 if ch_left == ch_right {
@@ -65,17 +65,15 @@ fn part2_solve<'a>(input: impl Iterator<Item = &'a str>) -> usize {
     }
 
     return sum;
-
 }
 
-fn get_item_prio(item: u8) -> usize  {
+fn get_item_prio(item: u8) -> usize {
     let upper_bonus = if item.is_ascii_uppercase() { 26 } else { 0 };
     let ch_prio = upper_bonus + 1 + (item.to_ascii_lowercase() - 'a' as u8);
     // println!("Found duplicate '{}' prio is {}", ch3 as char, ch_prio);
 
     return ch_prio as usize;
 }
-
 
 #[cfg(test)]
 mod test {
@@ -93,7 +91,7 @@ CrZsJsPPZsGzwwsLwLmpwMDw
         let expected = 157;
 
         let res = super::part1_solve(INPUT.lines());
-        
+
         assert_eq!(res, expected);
     }
 
@@ -102,8 +100,7 @@ CrZsJsPPZsGzwwsLwLmpwMDw
         let expected = 70;
 
         let res = super::part2_solve(INPUT.lines());
-        
+
         assert_eq!(res, expected);
     }
 }
-
