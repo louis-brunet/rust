@@ -8,7 +8,7 @@ fn main() {
         process::exit(1);
     });
 
-    if let Err(err) = adventofcode::day04::run(config) {
+    if let Err(err) = adventofcode::day05::run(config) {
         handle_app_error(&err);
         process::exit(1);
     }
@@ -19,10 +19,15 @@ fn usage() {
 }
 
 fn handle_parsing_error(err: &str) {
-    eprintln!("Could not parse arguments: {err}");
+    perror(format!("Could not parse arguments: {}", err));
     usage();
 }
 
 fn handle_app_error(err: &str) {
-    eprintln!("Application error: {}", err);
+    perror(format!("Application error: {}", err));
 }
+
+fn perror(err: String) {
+    eprintln!("\n[\x1b[31mE\x1b[0m] {}", err);
+}
+

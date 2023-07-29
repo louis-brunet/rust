@@ -1,4 +1,6 @@
 use std::fs;
+use std::io;
+use std::io::Read;
 
 #[derive(Debug)]
 pub struct FilePathConfig {
@@ -29,13 +31,20 @@ impl FileContentConfig {
     ) -> Result<FileContentConfig, &'static str> {
         args.next();
 
-        let content = match args.next() {
-            None => return Err("need file path argument"),
-            Some(path) => fs::read_to_string(path),
+        let content: String;
+        match args.next() {
+            None => { // no file path, use stdin
+                println!("No file path provided, using standard input:");
+                let mut input = String::new();
+                io::stdin().read_to_string(&mut input).map_err(|_| "could not read stdin")?;
+                content = input;
+            },
+
+            Some(path) => {
+                content = fs::read_to_string(path).map_err(|_| "could not read file")?;
+            },
         };
 
-        return content
-            .map(|str| FileContentConfig { content: str })
-            .map_err(|_| "could not read file");
+        return Ok(FileContentConfig { content });
     }
 }
