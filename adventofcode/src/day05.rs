@@ -18,12 +18,12 @@ pub fn run(config: FileContentConfig) -> Result<(), String> {
 }
 
 fn part1_solve(input: &str) -> Result<String, String> {
-    let (mut stacks, mut instructions) = match parser::parse_part1(&mut Lexer::new(input)) {
+    let (mut stacks, instructions) = match parser::parse_part1(&mut Lexer::new(input)) {
         Ok(parsed) => parsed,
         Err(err) => return Err(format!("parser error: {}", err)),
     };
 
-    execute_instructions_part1(&mut stacks, &mut instructions);
+    execute_instructions_part1(&mut stacks, &instructions);
 
     let mut message = String::new();
     for mut stack in stacks {
@@ -37,12 +37,12 @@ fn part1_solve(input: &str) -> Result<String, String> {
 }
 
 fn part2_solve(input: &str) -> Result<String, String> {
-    let (mut stacks, mut instructions) = match parser::parse_part1(&mut Lexer::new(input)) {
+    let (mut stacks, instructions) = match parser::parse_part1(&mut Lexer::new(input)) {
         Ok(parsed) => parsed,
         Err(err) => return Err(format!("parser error: {}", err)),
     };
 
-    execute_instructions_part2(&mut stacks, &mut instructions);
+    execute_instructions_part2(&mut stacks, &instructions);
 
     let mut message = String::new();
     for mut stack in stacks {
@@ -55,7 +55,7 @@ fn part2_solve(input: &str) -> Result<String, String> {
     return Ok(message);
 }
 
-fn execute_instructions_part1(stacks: &mut Vec<VecDeque<Crate>>, instructions: &Vec<Instruction>) -> () {
+fn execute_instructions_part1(stacks: &mut [VecDeque<Crate>], instructions: &Vec<Instruction>) {
     for instruction in instructions {
         for _ in 0..instruction.count {
             let picked_up = stacks[instruction.from].pop_front();
@@ -68,7 +68,7 @@ fn execute_instructions_part1(stacks: &mut Vec<VecDeque<Crate>>, instructions: &
     }
 }
 
-fn execute_instructions_part2(stacks: &mut Vec<VecDeque<Crate>>, instructions: &Vec<Instruction>) -> () {
+fn execute_instructions_part2(stacks: &mut [VecDeque<Crate>], instructions: &Vec<Instruction>) {
     let mut picked_up: Vec<Crate> = Vec::new();
     for instruction in instructions {
         // picked_up.clear();
