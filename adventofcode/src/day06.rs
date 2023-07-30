@@ -55,39 +55,51 @@ fn solve(content: &str, expected_sequence_size: usize) -> Result<Option<usize>, 
 
 #[cfg(test)]
 mod test {
+    use std::fmt::{Debug, Display};
+
     #[test]
     fn part1_examples() {
         let examples = [
-            ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 7),
-            ("bvwbjplbgvbhsrlpgdmjqwftvncz", 5),
-            ("nppdvjthqldpwncqszvftbrmjlhg", 6),
-            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10),
-            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11),
+            ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", Ok(Some(7))),
+            ("bvwbjplbgvbhsrlpgdmjqwftvncz", Ok(Some(5))),
+            ("nppdvjthqldpwncqszvftbrmjlhg", Ok(Some(6))),
+            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", Ok(Some(10))),
+            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", Ok(Some(11))),
         ];
 
         for (input, expected) in examples {
-            let res = super::part1_solve(input)
-                .unwrap_or_else(|_| panic!("unexpected error on input '{}'", input));
-
-            assert_eq!(res, Some(expected), "unexpected result un input '{}', expected {:?} but got {:?}", input, Some(expected), res);
+            run_test(input, expected, super::part1_solve);
         }
     }
 
     #[test]
     fn part2_examples() {
         let examples = [
-            ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19),
-            ("bvwbjplbgvbhsrlpgdmjqwftvncz", 23),
-            ("nppdvjthqldpwncqszvftbrmjlhg", 23),
-            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29),
-            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26),
+            ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", Ok(Some(19))),
+            ("bvwbjplbgvbhsrlpgdmjqwftvncz", Ok(Some(23))),
+            ("nppdvjthqldpwncqszvftbrmjlhg", Ok(Some(23))),
+            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", Ok(Some(29))),
+            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", Ok(Some(26))),
         ];
 
         for (input, expected) in examples {
-            let res = super::part2_solve(input)
-                .unwrap_or_else(|_| panic!("unexpected error on input '{}'", input));
-
-            assert_eq!(res, Some(expected), "unexpected result un input '{}', expected {:?} but got {:?}", input, Some(expected), res);
+            run_test(input, expected, super::part2_solve);
         }
     }
+
+    fn run_test<I, O, F>(input: &I, expected_output: O, fn_to_test: F)
+    where
+        I: Display + ?Sized,
+        O: Debug + PartialEq,
+        F: Fn(&I) -> O,
+    {
+        let output = fn_to_test(input);
+
+        assert_eq!(
+            output, expected_output,
+            "unexpected result un input '{}', expected {:?} but got {:?}",
+            input, expected_output, output
+        );
+    }
 }
+
