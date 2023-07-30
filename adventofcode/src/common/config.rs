@@ -31,18 +31,16 @@ impl FileContentConfig {
     ) -> Result<FileContentConfig, &'static str> {
         args.next();
 
-        let content: String;
-        match args.next() {
+        let content: String = match args.next() {
             None => { // no file path, use stdin
                 println!("No file path provided, using standard input:");
                 let mut input = String::new();
                 io::stdin().read_to_string(&mut input).map_err(|_| "could not read stdin")?;
-                content = input;
+                
+                input
             },
 
-            Some(path) => {
-                content = fs::read_to_string(path).map_err(|_| "could not read file")?;
-            },
+            Some(path) => fs::read_to_string(path).map_err(|_| "could not read file")?,
         };
 
         return Ok(FileContentConfig { content });
