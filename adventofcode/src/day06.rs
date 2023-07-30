@@ -12,13 +12,28 @@ pub fn run(config: FileContentConfig) -> Result<(), String> {
             None => "not found".to_string(),
         }
     );
-    // let res2 = part2_solve(&config.content)?;
-    // println!("  Part 2: message={:?}", res2);
+
+    let res2 = part2_solve(&config.content)?;
+    println!(
+        "  Part 2: message start index is {}",
+        match res2 {
+            Some(index) => index.to_string(),
+            None => "not found".to_string(),
+        }
+    );
+
     return Ok(());
 }
 
 fn part1_solve(content: &str) -> Result<Option<usize>, String> {
-    let expected_sequence_size = 4;
+    return solve(content, 4);
+}
+
+fn part2_solve(content: &str) -> Result<Option<usize>, String> {
+    return solve(content, 14);
+}
+
+fn solve(content: &str, expected_sequence_size: usize) -> Result<Option<usize>, String> {
     // new elements at the back, old elements at the front
     let mut unique_sequence: VecDeque<char> = VecDeque::with_capacity(expected_sequence_size);
 
@@ -40,8 +55,6 @@ fn part1_solve(content: &str) -> Result<Option<usize>, String> {
 
 #[cfg(test)]
 mod test {
-    use super::part1_solve;
-
     #[test]
     fn part1_examples() {
         let examples = [
@@ -53,7 +66,25 @@ mod test {
         ];
 
         for (input, expected) in examples {
-            let res = part1_solve(input)
+            let res = super::part1_solve(input)
+                .unwrap_or_else(|_| panic!("unexpected error on input '{}'", input));
+
+            assert_eq!(res, Some(expected), "unexpected result un input '{}', expected {:?} but got {:?}", input, Some(expected), res);
+        }
+    }
+
+    #[test]
+    fn part2_examples() {
+        let examples = [
+            ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19),
+            ("bvwbjplbgvbhsrlpgdmjqwftvncz", 23),
+            ("nppdvjthqldpwncqszvftbrmjlhg", 23),
+            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29),
+            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26),
+        ];
+
+        for (input, expected) in examples {
+            let res = super::part2_solve(input)
                 .unwrap_or_else(|_| panic!("unexpected error on input '{}'", input));
 
             assert_eq!(res, Some(expected), "unexpected result un input '{}', expected {:?} but got {:?}", input, Some(expected), res);
