@@ -98,7 +98,8 @@ $ ls
     #[test]
     fn part2_example() {
         let tree = parser::parse_file_tree(INPUT).unwrap();
-        let res = super::part2_solve(&tree, tree.root.size_recursive()).unwrap();
+        let (_, size) = super::part1_solve(&tree).unwrap();
+        let res = super::part2_solve(&tree, size).unwrap();
 
         assert_eq!(res, 24933642);
     }
