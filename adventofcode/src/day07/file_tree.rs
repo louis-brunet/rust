@@ -27,15 +27,6 @@ impl FsNode {
         )
     }
 
-    pub fn size_recursive(&self) -> u32 {
-        match self {
-            FsNode::File(size) => *size,
-            FsNode::Directory(children) => children.iter()
-                .map(|(_, node)| node.size_recursive())
-                .sum()
-        }
-    }
-
     fn find_child_directories<'a, P>(&'a self, predicate: &P, dirs: &mut Vec<(&'a str, u32)>) -> u32 
     where 
         P: Fn(u32) -> bool
